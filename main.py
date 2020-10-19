@@ -130,7 +130,7 @@ class CascadeTrtThread(threading.Thread):
                     self.condition.notify()
 
         # delete the model after inference process
-        del self.cascademodel
+        del self.yolov4_trt
 
         print("YOLOv4TrtThread: stopped...")
 
@@ -152,11 +152,39 @@ def compute_centroids(boxes):
 
 def get_scale(W, H):
     
-    dis_w = 400
-    dis_h = 800
+    dis_w = 200
+    dis_h = 600
     
     return float(dis_w/W),float(dis_h/H)
 
+def concat_images(vis_img, be_img):
+    """
+    Concatenate two images
+
+    Parameters
+    ----------
+    vis_img : numpy array image
+              cv2 image in Height x Width x Channel format
+    be_img  : numpy array image
+              cv2 image in Height x Width x Channel format
+
+    Returns
+    -------
+    conat_image : numpy array image
+                  concatenated numpy array image
+    """
+
+    concat_height = vis_img.shape[0]
+    be_height     = be_img.shape[0]
+
+    be_canvas = np.zeros((concat_height, be_img.shape[1], 3))
+    
+    h = int((concat_height - be_height)/ 2)
+    be_canvas[h:be_height+h, :, :] = be_img
+
+    concat_image = np.hstack((vis_img, be_canvas))
+
+    return concat_image.astype(np.uint8)
 
 def monitor(condition, cfg, input_size):
     """
@@ -187,7 +215,7 @@ def monitor(condition, cfg, input_size):
     # writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     path = "monitor_record.mp4"
-    writer = cv2.VideoWriter(path, fourcc, 20, (input_size[0], input_size[1]), True)
+    writer = cv2.VideoWriter(path, fourcc, 20, (1480, input_size[1]), True)
 
     # Setup parameters for generating bird-eye view
     # generate transform matrix
@@ -223,17 +251,19 @@ def monitor(condition, cfg, input_size):
             bird_eye_image = T.bird_eye_view_transform(frame, new_centroids, scale_w=scale_w, scale_h=scale_h)
             
             visualize_image = visualize(frame, results, fps)
-            cv2.imwrite("be.jpg", bird_eye_image)
-            cv2.imwrite("visualized_image.jpg", visualize_image)
             
-            if write_flag:
-                pass
-                
             toc = time.time()
             curr_fps = 1.0 / (toc - tic)
             # calculate an exponentially decaying average of fps number
             fps = curr_fps if fps == 0.0 else (fps*0.95 + curr_fps*0.05)
             tic = toc
+
+        # print(flag)            
+        if flag:
+            monitor_img = concat_images(visualize_image, bird_eye_image)
+            writer.write(monitor_img)
+        else:
+            break
 
 def _set_window(video_path,  window_name, title):
     """Set the width and height of the video if self.record is True
