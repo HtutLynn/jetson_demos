@@ -17,6 +17,6 @@ echo "Compiling..."
 make -j4
 
 # update the bash profile
-echo 'export PATH=/nvdli-nano/jetson_demos/cmake-3.13.0/bin/:$PATH' >> ~/.bashrc
+echo 'export PATH=~/nvdli-nano/jetson_demos/cmake-3.13.0/bin/:$PATH' >> ~/.bashrc
 source ~/.bashrc
 
