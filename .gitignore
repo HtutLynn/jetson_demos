@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# darknet weight files
+*.weights
+*.onnx
+*.cfg
+*.trt
+
 # C extensions
 *.so
 

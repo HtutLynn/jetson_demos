@@ -44,7 +44,6 @@ def visualize(image, preds, fps):
 
     return image
 
-
 class CascadeTrtThread(threading.Thread):
     """Cascade model TensorRT child thread
 
@@ -210,6 +209,9 @@ def monitor(condition, cfg, input_size):
     # parse data from arguments
     input_size = input_size
 
+    # container for storing fps values
+    all_fps = []
+
     T = Transform()
 
     # writer
@@ -251,6 +253,7 @@ def monitor(condition, cfg, input_size):
             bird_eye_image = T.bird_eye_view_transform(frame, new_centroids, scale_w=scale_w, scale_h=scale_h)
             
             visualize_image = visualize(frame, results, fps)
+            all_fps.append(int(fps))
             
             toc = time.time()
             curr_fps = 1.0 / (toc - tic)
@@ -265,6 +268,11 @@ def monitor(condition, cfg, input_size):
         else:
             break
 
+    all_fps = np.array(all_fps)
+    print("Average FPS : {}".format(np.average(all_fps)))
+    print("Lowest  FPS : {}".format(np.amin(all_fps)))
+    print("Highest FPS : {}".format(np.amax(all_fps)))
+
 def _set_window(video_path,  window_name, title):
     """Set the width and height of the video if self.record is True
     """
@@ -276,7 +284,6 @@ def _set_window(video_path,  window_name, title):
     im_height = int(vc.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     return (im_width, im_height)
-
 
 def main():
     """
