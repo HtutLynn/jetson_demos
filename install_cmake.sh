@@ -13,7 +13,7 @@ tar xpvf cmake-3.13.0.tar.gz cmake-3.13.0/
 # change directory
 cd cmake-3.13.0/
 echo "Compiling..."
-./bootstrap --system-curl
+./bootstrap --no-system-curl
 make -j4
 
 # update the bash profile
