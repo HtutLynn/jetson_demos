@@ -21,41 +21,29 @@ echo "Exporting CMake path..."
 echo 'export PATH=/nvdli-nano/jetson_demos/cmake-3.13.0/bin/:$PATH' >> ~/.bashrc
 source ~/.bashrc
 
-wget https://github.com/protocolbuffers/protobuf/archive/v3.9.0.zip
-unzip v3.9.0.zip
-cd protobuf-3.9.0
+echo "Copy protoc installation files into jetson_demos"
+cp -r /nvdli-nano/data/protoc-3.13.0 /nvdli-nano/jetson_demos/protoc-3.13.0
+cp -r /nvdli-nano/data/protobuf-3.13.0 /nvdli-nano/jetson_demos/protobuf-3.13.0
+
+sudo cp protoc-3.13.0/bin/protoc /usr/local/bin/protoc
+
+cho "** Build and install protobuf-3.13.0 libraries"
+export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
+cd protobuf-3.13.0/
 ./autogen.sh
-./configure --prefix=/usr/local/protobuf/3_9_0
-make
-make install
+./configure --prefix=/usr/local
+make -j$(nproc)
+make check
+sudo make install
+sudo ldconfig
 
-// /usr/local/bin
-ln -s /usr/local/protobuf/3_9_0/bin/protoc /usr/local/bin/
+cho "** Update python3 protobuf module"
+# remove previous installation of python3 protobuf module
+python3 -m pip uninstall -y protobuf
+python3 -m pip install Cython
+cd python/
+python3 setup.py build --cpp_implementation
+python3 setup.py test --cpp_implementation
+python3 setup.py install --cpp_implementation
 
-// /usr/local/include/google
-ln -s /usr/local/protobuf/3_9_0/include/google/protobuf /usr/local/include/google/
-
-// /usr/local/lib
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf.a /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf.la /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf-lite.a /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf-lite.la /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf-lite.so /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf-lite.so.20 /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf-lite.so.20.0.0 /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf.so /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf.so.20 /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotobuf.so.20.0.0 /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotoc.a /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotoc.la /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotoc.so /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotoc.so.20 /usr/local/lib/
-ln -s /usr/local/protobuf/3_9_0/lib/libprotoc.so.20.0.0 /usr/local/lib/
-
-// /usr/local/lib/pkgconfig
-ln -s /usr/local/protobuf/3_9_0/lib/pkgconfig/protobuf-lite.pc /usr/local/lib/pkgconfig/
-ln -s /usr/local/protobuf/3_9_0/lib/pkgconfig/protobuf.pc /usr/local/lib/pkgconfig/
-
-echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
-echo 'export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH' >> ~/.bashrc
-source >> ~/.bashrc
+echo "** Build protobuf-3.13.0 successfully"
