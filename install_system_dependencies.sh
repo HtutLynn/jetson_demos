@@ -26,7 +26,7 @@ folder=${HOME}/src
 mkdir -p $folder
 
 echo "** Install requirements"
-apt-get install -y autoconf libtool
+# apt-get install -y autoconf libtool
 
 echo "** Install autoconf from source"
 wget http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz -q --show-progress --no-clobber
