@@ -29,7 +29,7 @@ echo "** Install requirements"
 # apt-get install -y autoconf libtool
 
 echo "** Install autoconf from m4"
-wget http://ftp://ftp.gnu.org/gnu/m4/m4-1.4.9.tar.gz -q --show-progress --no-clobber
+wget http://ftp.gnu.org/gnu/m4/m4-1.4.9.tar.gz -q --show-progress --no-clobber
 tar xvfz m4-1.4.9.tar.gz
 cd m4-1.4.9
 ./configure --prefix=/usr/local/m4/1_4_9
