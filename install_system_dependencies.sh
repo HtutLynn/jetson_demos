@@ -25,7 +25,7 @@ echo "Copy protoc installation files into jetson_demos"
 cp -r /nvdli-nano/data/protoc-3.13.0 /nvdli-nano/jetson_demos/protoc-3.13.0
 cp -r /nvdli-nano/data/protobuf-3.13.0 /nvdli-nano/jetson_demos/protobuf-3.13.0
 
-sudo cp protoc-3.13.0/bin/protoc /usr/local/bin/protoc
+cp protoc-3.13.0/bin/protoc /usr/local/bin/protoc
 
 cho "** Build and install protobuf-3.13.0 libraries"
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
@@ -34,8 +34,8 @@ cd protobuf-3.13.0/
 ./configure --prefix=/usr/local
 make -j$(nproc)
 make check
-sudo make install
-sudo ldconfig
+make install
+ldconfig
 
 cho "** Update python3 protobuf module"
 # remove previous installation of python3 protobuf module
