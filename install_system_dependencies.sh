@@ -21,3 +21,7 @@ echo "Exporting CMake path..."
 echo 'export PATH=/nvdli-nano/jetson_demos/cmake-3.13.0/bin/:$PATH' >> ~/.bashrc
 source ~/.bashrc
 
+apt-get install libfreetype6-dev python3-setuptools
+apt-get install protobuf-compiler libprotobuf-dev openssl
+apt-get install libssl-dev libcurl4-openssl-dev
+apt-get install cython3
