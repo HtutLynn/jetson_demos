@@ -35,6 +35,7 @@ echo "Done."
 # install required packages
 python3 -m pip install pyyaml==5.1
 python3 -m pip install onnx==1.4.1
+python3 -m pip install easydict
 python3 -m pip install onnxruntime
 
 # convert from Darknet to ONNX
