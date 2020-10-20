@@ -2,25 +2,25 @@
 
 set -e
 apt-get update
-apt-get install -y autoconf libtool automake dh-autoreconf automake
+apt-get install -y autoconf libtool automake dh-autoreconf automake cmake
 # Download Cmake installer file
-echo "Downloading CMake files"
-wget http://www.cmake.org/files/v3.13/cmake-3.13.0.tar.gz -q --show-progress --no-clobber
-# extract and change permissions
-echo "Extracting CMake files"
-tar xpvf cmake-3.13.0.tar.gz cmake-3.13.0/
+# echo "Downloading CMake files"
+# wget http://www.cmake.org/files/v3.13/cmake-3.13.0.tar.gz -q --show-progress --no-clobber
+# # extract and change permissions
+# echo "Extracting CMake files"
+# tar xpvf cmake-3.13.0.tar.gz cmake-3.13.0/
 
-# Compile 
-# change directory
-cd cmake-3.13.0/
-echo "Compiling..."
-./bootstrap --no-system-curl
-make -j4
+# # Compile 
+# # change directory
+# cd cmake-3.13.0/
+# echo "Compiling..."
+# ./bootstrap --no-system-curl
+# make -j4
 
-# update the bash profile
-echo "Exporting CMake path..."
-echo 'export PATH=/nvdli-nano/jetson_demos/cmake-3.13.0/bin/:$PATH' >> ~/.bashrc
-source ~/.bashrc
+# # update the bash profile
+# echo "Exporting CMake path..."
+# echo 'export PATH=/nvdli-nano/jetson_demos/cmake-3.13.0/bin/:$PATH' >> ~/.bashrc
+# source ~/.bashrc
 cd /nvdli-nano/jetson_demos
 
 echo "Copy protoc installation files into jetson_demos"
