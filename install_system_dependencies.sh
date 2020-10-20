@@ -28,6 +28,25 @@ mkdir -p $folder
 echo "** Install requirements"
 # apt-get install -y autoconf libtool
 
+echo "** Install autoconf from m4"
+wget http://ftp://ftp.gnu.org/gnu/m4/m4-1.4.9.tar.gz -q --show-progress --no-clobber
+tar xvfz m4-1.4.9.tar.gz
+cd m4-1.4.9
+./configure --prefix=/usr/local/m4/1_4_9
+make
+make check
+make install
+
+echo "** create symbolic link for m4..."
+ln -s /usr/local/m4/1_4_9/bin/m4 /usr/local/bin
+
+echo "** set Environment Variable..."
+echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+echo "export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH" >> ~/.bashrc
+source ~/.bashrc
+
+echo "m4 installation done!"
+
 echo "** Install autoconf from source"
 wget http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz -q --show-progress --no-clobber
 tar xvfz autoconf-2.69.tar.gz
