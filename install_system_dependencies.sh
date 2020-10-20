@@ -20,6 +20,7 @@ make -j4
 echo "Exporting CMake path..."
 echo 'export PATH=/nvdli-nano/jetson_demos/cmake-3.13.0/bin/:$PATH' >> ~/.bashrc
 source ~/.bashrc
+cd /nvdli-nano/jetson_demos
 
 echo "** Install autoconf from source"
 wget http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz -q --show-progress --no-clobber
