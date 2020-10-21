@@ -1,5 +1,6 @@
 # import tensorrt related libraries
 from os import write
+from threading import local
 import pycuda.driver as cuda
 import tensorrt as trt
 
@@ -10,10 +11,12 @@ import time
 import argparse
 import threading
 import numpy as np
+from datetime import datetime
 
 # import helper functions
 from utils.yamlparser import YamlParser
 from utils.transform import Transform
+from utils.s3upload import VideoUploader
 
 # import tensorrt runtime wrapper 
 from yolov4 import TrtYOLOv4
@@ -26,6 +29,7 @@ def parse_args():
     parser.add_argument("--nms_threshold", type=float, default=0.5)
     parser.add_argument("--config", type=str, default="view.yaml")
     parser.add_argument("--record", type=bool, default=True)
+    parser.add_argument("--upload", type=bool, default=True)
 
     return parser.parse_args()
 
@@ -130,6 +134,7 @@ class CascadeTrtThread(threading.Thread):
 
         # delete the model after inference process
         del self.yolov4_trt
+        self.cam.release()
 
         print("YOLOv4TrtThread: stopped...")
 
@@ -211,12 +216,15 @@ def monitor(condition, cfg, input_size):
 
     # container for storing fps values
     all_fps = []
-
+    
+    # create helper function instances
     T = Transform()
+    uploader = VideoUploader()
 
     # writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    path = "monitor_record.mp4"
+    _now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    path = "monitor_record_{}.mp4".format(_now)
     writer = cv2.VideoWriter(path, fourcc, 20, (1480, input_size[1]), True)
 
     # Setup parameters for generating bird-eye view
@@ -267,11 +275,15 @@ def monitor(condition, cfg, input_size):
             writer.write(monitor_img)
         else:
             break
-
+    
+    writer.release()
     all_fps = np.array(all_fps)
     print("Average FPS : {}".format(np.average(all_fps)))
     print("Lowest  FPS : {}".format(np.amin(all_fps)))
     print("Highest FPS : {}".format(np.amax(all_fps)))
+
+    if cfg.upload:
+        uploader.upload(local_file=path, s3_file=path)
 
 def _set_window(video_path,  window_name, title):
     """Set the width and height of the video if self.record is True

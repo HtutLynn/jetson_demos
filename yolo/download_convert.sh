@@ -36,7 +36,8 @@ echo "Done."
 python3 -m pip install pyyaml==5.1
 python3 -m pip install onnx==1.4.1
 python3 -m pip install easydict
-python3 -m pip install onnxruntime
+python3 -m pip install boto3
+# python3 -m pip install onnxruntime
 
 # convert from Darknet to ONNX
 python3 yolo_to_onnx.py --model yolov4-288
