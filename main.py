@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument("--nms_threshold", type=float, default=0.5)
     parser.add_argument("--config", type=str, default="view.yaml")
     parser.add_argument("--record", type=bool, default=True)
-    parser.add_argument("--upload", type=bool, default=True)
+    parser.add_argument("--upload", type=bool, default=False)
 
     return parser.parse_args()
 
@@ -39,7 +39,7 @@ def visualize(image, preds, fps):
     """
     # show inference info
     fps_text = "FPS : {:.2f}".format(fps)
-    cv2.putText(image, fps_text, (11, 40), cv2.FONT_HERSHEY_PLAIN, 4.0, (32, 32, 32), 4, cv2.LINE_AA)
+    cv2.putText(image, fps_text, (11, 40), cv2.FONT_HERSHEY_PLAIN, 4.0, (238, 130, 238), 4, cv2.LINE_AA)
 
     if preds.shape[0] != 0:
         for box in preds:
@@ -161,6 +161,35 @@ def get_scale(W, H):
     
     return float(dis_w/W),float(dis_h/H)
 
+def draw_roi(frame, points):
+    """
+    Draw a region, which will be used for bird's eye view transformation
+
+    Parameters
+    ----------
+    frame  : numpy array
+             cv2 numpy array image
+    points : list
+             List, containing points coordinates of region-of-interest
+
+    Returns
+    -------
+    roi_frame : numpy array
+                cv2 numpy array image
+    """
+
+    # Points in [bot_left, bot_right, top_right, top_left]
+    # line 1 : bot_left --> bot_right
+    # line 2 : bot_right --> top_left
+    # line 3 : top_left --> top_right
+    # line 4 : top_right --> bot_left
+    roi_frame = cv2.line(frame, points[0], points[1], (70, 70, 70), 2)
+    roi_frame = cv2.line(roi_frame, points[1], points[2], (70, 70, 70), 2)
+    roi_frame = cv2.line(roi_frame, points[2], points[3], (70, 70, 70), 2)
+    roi_frame = cv2.line(roi_frame, points[3], points[0], (70, 70, 70), 2)
+
+    return roi_frame
+
 def concat_images(vis_img, be_img):
     """
     Concatenate two images
@@ -260,6 +289,7 @@ def monitor(condition, cfg, input_size):
             # generate bird-eye image
             bird_eye_image = T.bird_eye_view_transform(frame, new_centroids, scale_w=scale_w, scale_h=scale_h)
             
+            frame = draw_roi(frame, [tuple(tl), tuple(tr), tuple(br), tuple(bl)])
             visualize_image = visualize(frame, results, fps)
             all_fps.append(int(fps))
             
