@@ -19,19 +19,13 @@ class VideoUploader(object):
         bucket      : str
                       Amazon S3 bucket
         """
-        if access_key is None:
-            self.access_key = "AKIAQGCMKU6ID4SBRKKZ"
-        if secret_key is None:
-            self.secret_key = "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"
         if bucketName is None:
             self.bucketName = "altotechpublic"
 
-        # session = boto3.Session(profile_name='default')
+        session = boto3.Session(profile_name='default')
         # self.s3 = boto3.client('s3', aws_access_key_id=self.access_key,
         #                         aws_secret_access_key=self.secret_key)
-        self.s3_resource = boto3.resource('s3',
-                                          aws_access_key_id=self.access_key,
-                                          aws_secret_access_key=self.secret_key)
+        self.s3_resource = session.resource('s3')
         
     def upload(self, local_file, s3_file):
         """
