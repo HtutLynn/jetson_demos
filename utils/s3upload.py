@@ -6,7 +6,7 @@ class VideoUploader(object):
     """
     Uploader function for uploading video file to S3 Bucket
     """
-    def __init__(self, access_key=None, secret_key=None, bucketName=None):
+    def __init__(self, profile_name="default", bucketName=None):
         """
         Initialize parameters, required for uploading files to AWS S3 bucket.
 
@@ -22,7 +22,7 @@ class VideoUploader(object):
         if bucketName is None:
             self.bucketName = "altotechpublic"
 
-        session = boto3.Session(profile_name='default')
+        session = boto3.Session(profile_name=profile_name)
         # self.s3 = boto3.client('s3', aws_access_key_id=self.access_key,
         #                         aws_secret_access_key=self.secret_key)
         self.s3_resource = session.resource('s3')

@@ -30,6 +30,7 @@ def parse_args():
     parser.add_argument("--config", type=str, default="view.yaml")
     parser.add_argument("--record", type=bool, default=True)
     parser.add_argument("--upload", type=bool, default=False)
+    parser.add_argument("--profile", type=str, default="user1")
 
     return parser.parse_args()
 
@@ -237,6 +238,7 @@ def monitor(condition, cfg, input_size):
 
 
     view = str(cfg.config)
+    s3_profile = str(cfg.profile)
     # check whether the files exists or not
     assert os.path.isfile(view), "Configuration file doesn't exist!"
 
@@ -248,7 +250,7 @@ def monitor(condition, cfg, input_size):
     
     # create helper function instances
     T = Transform()
-    uploader = VideoUploader()
+    uploader = VideoUploader(profile_name=s3_profile)
 
     # writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
