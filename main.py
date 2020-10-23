@@ -250,7 +250,6 @@ def monitor(condition, cfg, input_size):
     
     # create helper function instances
     T = Transform()
-    uploader = VideoUploader(profile_name=s3_profile)
 
     # writer
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -315,6 +314,7 @@ def monitor(condition, cfg, input_size):
     print("Highest FPS : {}".format(np.amax(all_fps)))
 
     if cfg.upload:
+        uploader = VideoUploader(profile_name=s3_profile)
         uploader.upload(local_file=path, s3_file=path)
 
 def _set_window(video_path,  window_name, title):
