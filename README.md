@@ -12,18 +12,25 @@ $ git clone https://github.com/HtutLynn/jetson_demos.git
 $ cd jetson_demos
 ```
 
-3. install system dependencies to install required python packages
+3. Make YOLO layer
 ```sh
+$ cd plugins
+$ make
+```
+
+4. install system dependencies to install required python packages
+```sh
+cd ..
 ./install_system_dependencies.sh
 ```
 
-4. Download YOLO weight files, install python dependencies and convert to TensorRT runtime models
+5. Download YOLO weight files, install python dependencies and convert to TensorRT runtime models
 ```sh
 cd yolo
 ./download_convert.sh
 ```
 
-5. Run the monitoring pipeline
+6. Run the monitoring pipeline
 ```sh
 python3 main.py --upload False
 ```

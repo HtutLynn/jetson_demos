@@ -40,6 +40,6 @@ python3 -m pip install boto3
 # python3 -m pip install onnxruntime
 
 # convert from Darknet to ONNX
-python3 yolo_to_onnx.py --model yolov4-288
+python3 yolo_to_onnx.py --model yolov4-tiny-288
 # convert ONNX to TensorRT
-python3 onnx_to_tensorrt.py --model yolov4-288
+python3 onnx_to_tensorrt.py --model yolov4-tiny-288

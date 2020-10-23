@@ -19,17 +19,18 @@ from utils.transform import Transform
 from utils.s3upload import VideoUploader
 
 # import tensorrt runtime wrapper 
-from yolov4 import TrtYOLOv4
+from yolo_with_plugins import TrtYOLO
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--video", type=str, default="data/example.mp4")
-    parser.add_argument("--model", type=str, default="yolo/yolov4-288.trt")
+    parser.add_argument("--model", type=str, default="yolov4-tiny-288")
     parser.add_argument("--conf_threshold", type=float, default=0.3)
     parser.add_argument("--nms_threshold", type=float, default=0.5)
     parser.add_argument("--config", type=str, default="view.yaml")
     parser.add_argument("--record", type=bool, default=True)
     parser.add_argument("--upload", type=bool, default=False)
+    parser.add_argument("--categories", type=int, default=80)
     parser.add_argument("--profile", type=str, default="user1")
 
     return parser.parse_args()
@@ -78,7 +79,7 @@ class CascadeTrtThread(threading.Thread):
         Attributes
         ----------
         model           : str
-                          Path of the Human Detection TensorRT engine file
+                          Model Type -> [yolov4-tiny-288, yolov4-288, etc]
         conf_threshold  : int
                           Threshold value for confidence
         nms_threshold   : int
@@ -90,8 +91,9 @@ class CascadeTrtThread(threading.Thread):
         self.model               = cfg.model
         self.conf_threshold      = cfg.conf_threshold
         self.nms_threshold       = cfg.nms_threshold
+        self.categories          = cfg.categories
 
-        assert os.path.isfile(self.model), "TensorRT runtime model doesn't exist!"
+        # assert os.path.isfile(self.model), "TensorRT runtime model doesn't exist!"
 
         # Threading attributes
         # NOTE: cuda_ctx code has been moved into Cascade model TensorRT class
@@ -113,7 +115,7 @@ class CascadeTrtThread(threading.Thread):
         print("YOLOv4TrtThread: Loading the Engine...")
 
         # build the YOLOv4 TensorRT model engine
-        self.yolov4_trt = TrtYOLOv4(engine_path=self.model, input_shape=(288, 288), nms_thres=self.nms_threshold, conf_thres=self.conf_threshold)
+        self.yolo_trt = TrtYOLO(model=self.model, input_shape=(288, 288), category_num=self.categories)
 
         
         print("YOLOv4TrtThread: start running...")
@@ -122,7 +124,7 @@ class CascadeTrtThread(threading.Thread):
             ret, frame = self.cam.read()
 
             if ret:
-                results = self.yolov4_trt.detect(frame)
+                results = self.yolo_trt.detect(frame, conf_th=self.conf_threshold)
                 with self.condition:
                     preds      = results
                     image      = frame
@@ -134,7 +136,7 @@ class CascadeTrtThread(threading.Thread):
                     self.condition.notify()
 
         # delete the model after inference process
-        del self.yolov4_trt
+        del self.yolo_trt
         self.cam.release()
 
         print("YOLOv4TrtThread: stopped...")
